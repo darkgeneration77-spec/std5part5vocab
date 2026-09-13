@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Year 5 Word Scoop</title>
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--ink:#172033;--muted:#6b7280;--line:#e7eaf0;--brand:#111827;--soft:#eef2ff;--ok:#166534;--bad:#991b1b}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input{font:inherit}button{cursor:pointer}
+.shell{max-width:1180px;margin:auto;padding:28px 18px 60px}
+.hero{background:linear-gradient(135deg,#fff,#eef2ff);border:1px solid var(--line);border-radius:28px;padding:30px;box-shadow:0 18px 50px rgba(17,24,39,.06)}
+.eyebrow{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#4f46e5}
+h1{font-size:clamp(34px,6vw,66px);margin:8px 0 6px;line-height:.95}.sub{color:var(--muted);font-size:18px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:24px}.stat{background:white;border:1px solid var(--line);border-radius:18px;padding:18px}.num{font-size:28px;font-weight:900}.label{color:var(--muted);font-size:13px}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:20px 0}.student{display:flex;gap:8px;align-items:center}input{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:white}
+.btn{border:0;border-radius:12px;padding:11px 15px;background:var(--brand);color:white;font-weight:800}.btn.secondary{background:white;color:var(--ink);border:1px solid var(--line)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 10px 30px rgba(17,24,39,.04)}.card h3{margin:5px 0 6px}.tag{font-size:12px;font-weight:800;color:#4f46e5}.words{color:var(--muted);font-size:14px;min-height:42px}.progress{height:7px;background:#eef0f4;border-radius:999px;overflow:hidden;margin:14px 0}.bar{height:100%;background:#111827;width:0}
+.section-title{font-size:28px;margin:34px 0 14px}.checkpoints{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.cp{padding:18px;border-radius:18px;border:1px solid var(--line);background:white}.locked{opacity:.55}
+.modal{position:fixed;inset:0;background:rgba(17,24,39,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.open{display:flex}.panel{width:min(760px,100%);max-height:90vh;overflow:auto;background:white;border-radius:24px;padding:24px}.panelhead{display:flex;justify-content:space-between;gap:12px;align-items:start}.close{border:0;background:#f3f4f6;border-radius:50%;width:38px;height:38px;font-size:20px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab{border:1px solid var(--line);background:white;padding:9px 12px;border-radius:999px;font-weight:800}.tab.active{background:#111827;color:white}
+.wordlist{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.worditem{padding:14px;border:1px solid var(--line);border-radius:14px}.worditem b{font-size:18px}.meaning{color:var(--muted);margin-top:3px}
+.quizbox{border:1px solid var(--line);border-radius:18px;padding:20px;background:#fafafa}.qcount{font-size:12px;color:var(--muted);font-weight:800}.prompt{font-size:24px;font-weight:900;margin:12px 0 16px}.feedback{min-height:28px;font-weight:800;margin-top:12px}.ok{color:var(--ok)}.bad{color:var(--bad)}.footerline{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.chip{padding:7px 10px;border-radius:999px;background:#f3f4f6;font-size:13px}
+@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.checkpoints{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.grid,.wordlist{grid-template-columns:1fr}.topbar{align-items:stretch;flex-direction:column}}
+
+.actionbar{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 24px}
+.modechips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+.modechip{font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#f3f4f6;color:#6b7280}
+.modechip.done{background:#dcfce7;color:#166534}
+.dashboard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.mini{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+.mini .big{font-size:24px;font-weight:900}
+.tablewrap{overflow:auto;margin-top:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.home-stage{padding:24px;border-radius:22px;background:linear-gradient(135deg,#f9fafb,#eef2ff);border:1px solid var(--line);text-align:center}
+.home-room{font-size:54px;margin:10px 0}.shop{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.shopitem{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff;text-align:left}
+.locknote{font-size:13px;color:var(--muted);margin-top:8px}.section-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:700px){.dashboard-grid,.shop{grid-template-columns:1fr}}
+@media print{body *{visibility:hidden}.modal.open,.modal.open *{visibility:visible}.modal.open{position:absolute;inset:0;background:white}.panel{box-shadow:none;max-height:none;width:100%}.panelhead,.tabs,.close,.no-print{display:none!important}}
+
+
+.speakbtn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:7px 10px;font-weight:800;font-size:13px;margin-top:10px;cursor:pointer}
+.speakbtn:hover{background:#f3f4f6}.speakbtn:active{transform:translateY(1px)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="hero">
+    <div class="eyebrow">Year 5 · Word Scoop</div>
+    <h1>Scoop Up Your Spelling</h1>
+    <div class="sub">24 themes · 192 words · checkpoints · final challenge</div>
+    <div class="stats">
+      <div class="stat"><div class="num" id="sThemes">0/24</div><div class="label">Themes completed</div></div>
+      <div class="stat"><div class="num" id="sWords">0/192</div><div class="label">Words mastered</div></div>
+      <div class="stat"><div class="num" id="sRevise">0</div><div class="label">Words to revise</div></div>
+      <div class="stat"><div class="num" id="sCoins">0</div><div class="label">Coins</div></div>
+      <div class="stat"><div class="num" id="sAverage">—</div><div class="label">Average score</div></div>
+    </div>
+  </div>
+
+  <div class="topbar">
+    <div class="student">
+      <input id="studentName" placeholder="Student name">
+      <button class="btn" onclick="saveStudent()">Save Student</button>
+    </div>
+    <button class="btn secondary" onclick="resetProgress()">Reset Progress</button>
+  </div>
+  <div class="actionbar">
+    <button class="btn secondary" onclick="openReviseAll()">Revise Mistakes</button>
+    <button class="btn secondary" onclick="showDashboard()">Teacher Dashboard</button>
+    <button class="btn secondary" onclick="showHome()">My Home</button>
+    <button class="btn secondary" onclick="downloadBackup()">Download Backup</button>
+    <button class="btn secondary" onclick="document.getElementById('restoreFile').click()">Restore Backup</button>
+    <input id="restoreFile" type="file" accept=".json,application/json" style="display:none" onchange="restoreBackup(this.files[0]);this.value=''">
+  </div>
+
+  <h2 class="section-title">Themes</h2>
+  <div class="grid" id="themeGrid"></div>
+
+  <h2 class="section-title">Checkpoint Reviews</h2>
+  <div class="checkpoints" id="checkpointGrid"></div>
+
+  <h2 class="section-title">Final Challenge</h2>
+  <div class="card">
+    <h3>Final 192 Words Challenge</h3>
+    <p class="words">Complete all 192 words. Unlocks after all 4 checkpoint badges are earned.</p>
+    <div id="finalStatus" style="margin:10px 0 14px;font-weight:800">Locked · Earn all 4 checkpoint badges first</div>
+    <button class="btn" id="finalBtn" onclick="openFinal()" disabled>Start Final Challenge</button>
+  </div>
+
+  <h2 class="section-title">Certificate</h2>
+  <div class="card">
+    <h3>Year 5 Word Scoop Certificate</h3>
+    <p class="words">Unlocks after passing the full 192-word Final Challenge.</p>
+    <button class="btn" id="certBtn" onclick="showCertificate()" disabled>View Certificate</button>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="panel">
+    <div class="panelhead">
+      <div><div class="eyebrow" id="mEyebrow"></div><h2 id="mTitle" style="margin:5px 0"></h2></div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const THEMES = [{"name": "Hobbies", "words": [{"word": "photography", "meaning": "摄影", "definition": "taking photos as an activity"}, {"word": "chatting", "meaning": "聊天", "definition": "talking with someone in a friendly way"}, {"word": "cycling", "meaning": "骑自行车", "definition": "riding a bicycle as an activity"}, {"word": "shopping", "meaning": "购物", "definition": "buying things from shops"}, {"word": "reading", "meaning": "阅读", "definition": "looking at words and understanding them"}, {"word": "skateboarding", "meaning": "玩滑板", "definition": "riding on a skateboard"}, {"word": "basketball", "meaning": "篮球", "definition": "a game where players throw a ball into a basket"}, {"word": "hobby", "meaning": "爱好", "definition": "something you enjoy doing in your free time"}]}, {"name": "Interests", "words": [{"word": "favourite", "meaning": "最喜欢的", "definition": "the one you like the most"}, {"word": "interested", "meaning": "感兴趣的", "definition": "wanting to know more about something"}, {"word": "internet", "meaning": "互联网", "definition": "a network used to find and share information"}, {"word": "nationality", "meaning": "国籍", "definition": "the country a person comes from"}, {"word": "popular", "meaning": "受欢迎的", "definition": "liked by many people"}, {"word": "message", "meaning": "信息", "definition": "words or information sent to someone"}, {"word": "currency", "meaning": "货币", "definition": "the money used in a country"}, {"word": "capital", "meaning": "首都", "definition": "the main city of a country"}]}, {"name": "Useful Things", "words": [{"word": "dictionary", "meaning": "字典", "definition": "a book that tells you what words mean"}, {"word": "laptop", "meaning": "手提电脑", "definition": "a small computer you can carry"}, {"word": "mobile phone", "meaning": "手机", "definition": "a phone you can carry with you"}, {"word": "noticeboard", "meaning": "布告板", "definition": "a board where notices are put up"}, {"word": "envelope", "meaning": "信封", "definition": "a paper cover for a letter"}, {"word": "clock", "meaning": "时钟", "definition": "something that shows the time"}, {"word": "photograph", "meaning": "照片", "definition": "a picture taken with a camera"}, {"word": "information", "meaning": "资料", "definition": "facts about something"}]}, {"name": "Places", "words": [{"word": "monument", "meaning": "纪念碑", "definition": "a structure built to remember a person or event"}, {"word": "market", "meaning": "市场", "definition": "a place where people buy and sell things"}, {"word": "cinema", "meaning": "电影院", "definition": "a place where people watch films"}, {"word": "café", "meaning": "咖啡馆", "definition": "a small place that sells drinks and light food"}, {"word": "restaurant", "meaning": "餐厅", "definition": "a place where people pay to eat meals"}, {"word": "library", "meaning": "图书馆", "definition": "a place where people borrow books"}, {"word": "station", "meaning": "车站", "definition": "a place where buses or trains stop"}, {"word": "sports centre", "meaning": "体育中心", "definition": "a place where people do sports"}]}, {"name": "Town & City", "words": [{"word": "entrance", "meaning": "入口", "definition": "the place where you go into a building"}, {"word": "factory", "meaning": "工厂", "definition": "a building where things are made"}, {"word": "corner", "meaning": "角落", "definition": "the place where two streets or walls meet"}, {"word": "square", "meaning": "广场", "definition": "an open place in a town surrounded by buildings"}, {"word": "flat", "meaning": "公寓", "definition": "a home inside a larger building"}, {"word": "office", "meaning": "办公室", "definition": "a place where people work at desks"}, {"word": "population", "meaning": "人口", "definition": "the number of people living in a place"}, {"word": "direction", "meaning": "方向", "definition": "the way to go or move"}]}, {"name": "Describing Places", "words": [{"word": "comfortable", "meaning": "舒适的", "definition": "making you feel relaxed"}, {"word": "exciting", "meaning": "令人兴奋的", "definition": "making you feel very interested and happy"}, {"word": "expensive", "meaning": "昂贵的", "definition": "costing a lot of money"}, {"word": "famous", "meaning": "著名的", "definition": "known by many people"}, {"word": "modern", "meaning": "现代的", "definition": "new and not old-fashioned"}, {"word": "crowded", "meaning": "拥挤的", "definition": "full of people"}, {"word": "quiet", "meaning": "安静的", "definition": "making very little noise"}, {"word": "opposite", "meaning": "在……对面", "definition": "on the other side from something"}]}, {"name": "Days & Time", "words": [{"word": "April", "meaning": "四月", "definition": "the fourth month of the year"}, {"word": "August", "meaning": "八月", "definition": "the eighth month of the year"}, {"word": "February", "meaning": "二月", "definition": "the second month of the year"}, {"word": "century", "meaning": "世纪", "definition": "one hundred years"}, {"word": "ago", "meaning": "以前", "definition": "used to talk about a time before now"}, {"word": "moment", "meaning": "片刻", "definition": "a very short time"}, {"word": "midnight", "meaning": "午夜", "definition": "twelve o'clock at night"}, {"word": "calendar", "meaning": "日历", "definition": "something that shows the days and months of a year"}]}, {"name": "Daily Actions", "words": [{"word": "finish", "meaning": "完成", "definition": "to complete something"}, {"word": "chat", "meaning": "聊天", "definition": "to talk in a friendly way"}, {"word": "dance", "meaning": "跳舞", "definition": "to move your body to music"}, {"word": "collect", "meaning": "收集", "definition": "to bring things together or keep a group of things"}, {"word": "practise", "meaning": "练习", "definition": "to do something again to get better at it"}, {"word": "prepare", "meaning": "准备", "definition": "to get something ready"}, {"word": "invite", "meaning": "邀请", "definition": "to ask someone to come to an event"}, {"word": "celebrate", "meaning": "庆祝", "definition": "to do something special for a happy event"}]}, {"name": "Events", "words": [{"word": "invitation", "meaning": "邀请", "definition": "a request asking someone to come to an event"}, {"word": "celebration", "meaning": "庆祝活动", "definition": "a special event for a happy occasion"}, {"word": "festival", "meaning": "节日", "definition": "a special event with activities and celebrations"}, {"word": "costume", "meaning": "服装", "definition": "special clothes worn for a show or event"}, {"word": "present", "meaning": "礼物", "definition": "something given to someone as a gift"}, {"word": "special", "meaning": "特别的", "definition": "different from usual in an important way"}, {"word": "event", "meaning": "活动", "definition": "something planned that happens at a certain time"}, {"word": "holiday", "meaning": "假期", "definition": "a time when there is no school or work"}]}, {"name": "Wild Animals", "words": [{"word": "crocodile", "meaning": "鳄鱼", "definition": "a large reptile with strong jaws and a long body"}, {"word": "dolphin", "meaning": "海豚", "definition": "a sea animal that is intelligent and friendly"}, {"word": "eagle", "meaning": "鹰", "definition": "a large bird with a sharp beak"}, {"word": "gorilla", "meaning": "大猩猩", "definition": "a very large ape"}, {"word": "shark", "meaning": "鲨鱼", "definition": "a large sea fish with sharp teeth"}, {"word": "whale", "meaning": "鲸", "definition": "a very large sea animal that breathes air"}, {"word": "insect", "meaning": "昆虫", "definition": "a small animal with six legs"}, {"word": "octopus", "meaning": "章鱼", "definition": "a sea animal with eight arms"}]}, {"name": "Animal Features", "words": [{"word": "feathers", "meaning": "羽毛", "definition": "the soft covering on a bird"}, {"word": "scales", "meaning": "鳞片", "definition": "small hard plates on fish and reptiles"}, {"word": "claws", "meaning": "爪子", "definition": "sharp nails on some animals and birds"}, {"word": "beak", "meaning": "鸟喙", "definition": "the hard pointed mouth of a bird"}, {"word": "wings", "meaning": "翅膀", "definition": "the parts used by birds and insects to fly"}, {"word": "fur", "meaning": "毛皮", "definition": "the soft hair covering some animals"}, {"word": "teeth", "meaning": "牙齿", "definition": "the hard white parts in your mouth"}, {"word": "tail", "meaning": "尾巴", "definition": "the part at the back of an animal's body"}]}, {"name": "Animal World", "words": [{"word": "chase", "meaning": "追赶", "definition": "to run after someone or something"}, {"word": "hunt", "meaning": "捕猎", "definition": "to look for and catch animals"}, {"word": "hide", "meaning": "躲藏", "definition": "to go where others cannot see you"}, {"word": "jungle", "meaning": "丛林", "definition": "a thick tropical forest"}, {"word": "ocean", "meaning": "海洋", "definition": "a very large area of salt water"}, {"word": "everywhere", "meaning": "到处", "definition": "in every place"}, {"word": "alone", "meaning": "独自", "definition": "without anyone else"}, {"word": "dangerous", "meaning": "危险的", "definition": "able to hurt or harm someone"}]}, {"name": "Learning", "words": [{"word": "subject", "meaning": "科目", "definition": "something you study at school"}, {"word": "timetable", "meaning": "时间表", "definition": "a list that shows when lessons happen"}, {"word": "project", "meaning": "专题作业", "definition": "a piece of school work that takes time to finish"}, {"word": "homework", "meaning": "家庭作业", "definition": "school work done at home"}, {"word": "lesson", "meaning": "课", "definition": "a period of time when students are taught"}, {"word": "exercise", "meaning": "练习", "definition": "a task done to practise a skill"}, {"word": "question", "meaning": "问题", "definition": "words used to ask for information"}, {"word": "answer", "meaning": "答案", "definition": "what you say or write back to a question"}]}, {"name": "Learning Actions", "words": [{"word": "describe", "meaning": "描述", "definition": "to say what someone or something is like"}, {"word": "explain", "meaning": "解释", "definition": "to make something easier to understand"}, {"word": "compare", "meaning": "比较", "definition": "to look for similarities and differences"}, {"word": "understand", "meaning": "明白", "definition": "to know what something means"}, {"word": "remember", "meaning": "记得", "definition": "to keep something in your mind"}, {"word": "spell", "meaning": "拼写", "definition": "to write the letters of a word in the right order"}, {"word": "find out", "meaning": "查明", "definition": "to get information about something"}, {"word": "fill in", "meaning": "填写", "definition": "to write information in empty spaces"}]}, {"name": "Learning Materials", "words": [{"word": "textbook", "meaning": "课本", "definition": "a book used for studying a school subject"}, {"word": "notebook", "meaning": "笔记本", "definition": "a book used for writing notes"}, {"word": "website", "meaning": "网站", "definition": "a group of pages on the internet"}, {"word": "magazine", "meaning": "杂志", "definition": "a book-like publication with articles and pictures"}, {"word": "newspaper", "meaning": "报纸", "definition": "pages that give news and information"}, {"word": "computer", "meaning": "电脑", "definition": "an electronic machine used for information and work"}, {"word": "poster", "meaning": "海报", "definition": "a large notice or picture put on a wall"}, {"word": "article", "meaning": "文章", "definition": "a piece of writing in a magazine, newspaper or website"}]}, {"name": "Food", "words": [{"word": "flour", "meaning": "面粉", "definition": "a white powder used to make bread and cakes"}, {"word": "chopsticks", "meaning": "筷子", "definition": "two thin sticks used for eating"}, {"word": "cooker", "meaning": "炊具", "definition": "a kitchen appliance used for cooking"}, {"word": "pancake", "meaning": "煎饼", "definition": "a thin flat cake cooked in a pan"}, {"word": "noodles", "meaning": "面条", "definition": "long thin strips of food made from flour"}, {"word": "biscuit", "meaning": "饼干", "definition": "a small baked food that is often sweet"}, {"word": "vegetables", "meaning": "蔬菜", "definition": "plants or parts of plants eaten as food"}, {"word": "ingredients", "meaning": "食材", "definition": "the foods used to make a dish"}]}, {"name": "Cooking", "words": [{"word": "recipe", "meaning": "食谱", "definition": "instructions for making a dish"}, {"word": "cut", "meaning": "切", "definition": "to divide something with a knife"}, {"word": "boil", "meaning": "煮沸", "definition": "to cook food in very hot water"}, {"word": "fry", "meaning": "煎/炸", "definition": "to cook food in hot oil"}, {"word": "mix", "meaning": "混合", "definition": "to put things together"}, {"word": "dessert", "meaning": "甜点", "definition": "sweet food eaten at the end of a meal"}, {"word": "meal", "meaning": "一餐", "definition": "food eaten at one time of the day"}, {"word": "breakfast", "meaning": "早餐", "definition": "the first meal of the day"}]}, {"name": "Health", "words": [{"word": "accident", "meaning": "意外", "definition": "something bad that happens unexpectedly"}, {"word": "healthy", "meaning": "健康的", "definition": "strong and not ill"}, {"word": "medicine", "meaning": "药物", "definition": "something used to help treat illness"}, {"word": "toothache", "meaning": "牙痛", "definition": "pain in a tooth"}, {"word": "stomachache", "meaning": "胃痛", "definition": "pain in the stomach"}, {"word": "temperature", "meaning": "温度/体温", "definition": "how hot or cold something is"}, {"word": "pain", "meaning": "疼痛", "definition": "a feeling when part of your body hurts"}, {"word": "ill", "meaning": "生病的", "definition": "not well"}]}, {"name": "Sports", "words": [{"word": "badminton", "meaning": "羽毛球", "definition": "a sport where players hit a shuttlecock over a net"}, {"word": "volleyball", "meaning": "排球", "definition": "a sport where teams hit a ball over a net"}, {"word": "hockey", "meaning": "曲棍球", "definition": "a sport where players use sticks to hit a ball"}, {"word": "skiing", "meaning": "滑雪", "definition": "moving over snow on long narrow boards"}, {"word": "swimming", "meaning": "游泳", "definition": "moving through water as a sport or activity"}, {"word": "athletics", "meaning": "田径", "definition": "sports such as running and jumping"}, {"word": "gymnastics", "meaning": "体操", "definition": "a sport using balance, strength and body movements"}, {"word": "table tennis", "meaning": "乒乓球", "definition": "a game where players hit a small ball across a table"}]}, {"name": "Competition", "words": [{"word": "competition", "meaning": "比赛", "definition": "an event where people try to win"}, {"word": "champion", "meaning": "冠军", "definition": "a person or team that wins an important competition"}, {"word": "winner", "meaning": "获胜者", "definition": "the person or team that wins"}, {"word": "player", "meaning": "选手", "definition": "a person who takes part in a game"}, {"word": "score", "meaning": "得分", "definition": "the number of points or goals in a game"}, {"word": "goal", "meaning": "进球/目标", "definition": "a point scored in some sports"}, {"word": "race", "meaning": "赛跑", "definition": "a competition to see who is fastest"}, {"word": "training", "meaning": "训练", "definition": "practice done to improve at a sport"}]}, {"name": "Growing Up", "words": [{"word": "baby", "meaning": "婴儿", "definition": "a very young child"}, {"word": "child", "meaning": "儿童", "definition": "a young person who is not an adult"}, {"word": "teenager", "meaning": "青少年", "definition": "a person aged from thirteen to nineteen"}, {"word": "adult", "meaning": "成年人", "definition": "a fully grown person"}, {"word": "childhood", "meaning": "童年", "definition": "the time when a person is a child"}, {"word": "age", "meaning": "年龄", "definition": "the number of years a person has lived"}, {"word": "young", "meaning": "年轻的", "definition": "not old"}, {"word": "elderly", "meaning": "年长的", "definition": "old or becoming old"}]}, {"name": "Life & Past", "words": [{"word": "born", "meaning": "出生", "definition": "brought into life as a baby"}, {"word": "grow", "meaning": "成长", "definition": "to become bigger or older"}, {"word": "become", "meaning": "成为", "definition": "to start to be something"}, {"word": "move", "meaning": "搬迁", "definition": "to change where you live or where something is"}, {"word": "marry", "meaning": "结婚", "definition": "to become someone's husband or wife"}, {"word": "life", "meaning": "人生", "definition": "the time from being born until dying"}, {"word": "past", "meaning": "过去", "definition": "the time before now"}, {"word": "future", "meaning": "未来", "definition": "the time after now"}]}, {"name": "Going Away", "words": [{"word": "guidebook", "meaning": "旅游指南", "definition": "a book with useful information for visitors"}, {"word": "insect spray", "meaning": "驱虫喷雾", "definition": "a spray used to keep insects away"}, {"word": "sun cream", "meaning": "防晒霜", "definition": "cream used to protect your skin from the sun"}, {"word": "sleeping bag", "meaning": "睡袋", "definition": "a warm bag used for sleeping when camping"}, {"word": "toothbrush", "meaning": "牙刷", "definition": "a small brush used to clean your teeth"}, {"word": "torch", "meaning": "手电筒", "definition": "a small light you can carry"}, {"word": "towel", "meaning": "毛巾", "definition": "a piece of cloth used to dry your body"}, {"word": "water bottle", "meaning": "水瓶", "definition": "a container used to carry drinking water"}]}, {"name": "Travel Things", "words": [{"word": "phrasebook", "meaning": "常用语手册", "definition": "a small book of useful words in another language"}, {"word": "swimming costume", "meaning": "泳装", "definition": "clothes worn for swimming"}, {"word": "waterproofs", "meaning": "防水衣物", "definition": "clothes that keep you dry in the rain"}, {"word": "suitcase", "meaning": "行李箱", "definition": "a case used to carry clothes when travelling"}, {"word": "passport", "meaning": "护照", "definition": "an official document used for travel to another country"}, {"word": "campsite", "meaning": "营地", "definition": "a place where people stay in tents"}, {"word": "journey", "meaning": "旅程", "definition": "travelling from one place to another"}, {"word": "adventure", "meaning": "冒险", "definition": "an exciting or unusual experience"}]}];
+
+const KEY='year5-word-scoop-vFinal';
+const LEGACY_KEYS=['year5-word-scoop-v1'];
+const SHOP=[
+ {id:'lamp',name:'Study Lamp',cost:15},
+ {id:'plant',name:'Desk Plant',cost:20},
+ {id:'bookshelf',name:'Bookshelf',cost:25},
+ {id:'beanbag',name:'Beanbag Chair',cost:35},
+ {id:'trophy',name:'Trophy Shelf',cost:45},
+ {id:'clock',name:'Wall Clock',cost:30}
+];
+const HOME_LEVELS=[
+ {name:'Study Corner',cost:0,symbol:'⌂'},
+ {name:'Cozy Study Room',cost:50,symbol:'⌂+'},
+ {name:'Smart Study Room',cost:120,symbol:'⌂++'},
+ {name:'Dream Library',cost:220,symbol:'LIBRARY'}
+];
+
+function baseState(){
+ return {student:'',completed:{},mastered:{},revise:{},coins:0,badges:{},finalPassed:false,
+         themeModes:{},scores:{},home:{level:0,owned:[],spent:0},rewardedThemes:{}};
+}
+function loadState(){
+ let s=null;
+ try{s=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+ if(!s){
+   for(const k of LEGACY_KEYS){
+     try{s=JSON.parse(localStorage.getItem(k)||'null');if(s)break}catch(e){}
+   }
+ }
+ return migrateState(s||baseState());
+}
+function migrateState(s){
+ const d=baseState();
+ s=Object.assign(d,s||{});
+ s.completed=s.completed||{};s.mastered=s.mastered||{};s.revise=s.revise||{};s.badges=s.badges||{};
+ s.themeModes=s.themeModes||{};s.scores=s.scores||{};s.rewardedThemes=s.rewardedThemes||{};
+ s.home=Object.assign({level:0,owned:[],spent:0},s.home||{});
+ if(!Array.isArray(s.home.owned))s.home.owned=[];
+ // Preserve old completed themes by treating old completion as full mode completion.
+ Object.keys(s.completed).forEach(k=>{
+   if(s.completed[k] && !s.themeModes[k]) s.themeModes[k]={learn:true,definition:true,spell:true,exam:true};
+ });
+ // Convert old boolean revise flags to structured records.
+ Object.keys(s.revise).forEach(w=>{
+   if(s.revise[w]===true) s.revise[w]={streak:0,lastWrong:'',lastSeen:Date.now()};
+ });
+ return s;
+}
+let state=loadState();
+let currentTheme=0,quizMode='spell',quizItems=[],qi=0,score=0;
+let challengeReturnTheme=0;
+let testInProgress=false;
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render();}
+function saveStudent(){state.student=document.getElementById('studentName').value.trim();save();}
+function norm(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,' ')}
+function modeState(i){if(!state.themeModes[i])state.themeModes[i]={learn:false,definition:false,spell:false,exam:false};return state.themeModes[i]}
+function themeComplete(i){const m=modeState(i);return !!(m.learn&&m.definition&&m.spell&&m.exam)}
+function bestScore(key){return Number(state.scores[key]||0)}
+function recordBest(key,pct){if(pct>bestScore(key))state.scores[key]=pct}
+function averageScore(){
+ const vals=Object.values(state.scores).map(Number).filter(v=>Number.isFinite(v));
+ return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):null;
+}
+function addRevise(word,wrong=''){
+ const old=(state.revise[word]&&typeof state.revise[word]==='object')?state.revise[word]:{};
+ state.revise[word]={streak:0,lastWrong:wrong||old.lastWrong||'',lastSeen:Date.now()};
+}
+function reviseCorrect(word){
+ const old=(state.revise[word]&&typeof state.revise[word]==='object')?state.revise[word]:{streak:0};
+ old.streak=(old.streak||0)+1;old.lastSeen=Date.now();
+ if(old.streak>=2)delete state.revise[word];else state.revise[word]=old;
+}
+function wordRecord(word){return state.revise[word]&&typeof state.revise[word]==='object'?state.revise[word]:{streak:0,lastWrong:''}}
+function markThemeIfComplete(i){
+ const now=themeComplete(i);
+ if(now){
+   const first=!state.completed[i];
+   state.completed[i]=true;
+   if(first&&!state.rewardedThemes[i]){state.coins+=5;state.rewardedThemes[i]=true}
+ }else state.completed[i]=false;
+}
+function resetProgress(){
+ if(confirm('Reset all progress for this student?')){
+   const name=state.student;
+   state=baseState();state.student=name;save();
+ }
+}
+
+function render(){
+ document.getElementById('studentName').value=state.student||'';
+ const completed=Array.from({length:24},(_,i)=>themeComplete(i)).filter(Boolean).length;
+ const mastered=Object.keys(state.mastered).length;
+ const revise=Object.keys(state.revise).length;
+ document.getElementById('sThemes').textContent=`${completed}/24`;
+ document.getElementById('sWords').textContent=`${mastered}/192`;
+ document.getElementById('sRevise').textContent=revise;
+ document.getElementById('sCoins').textContent=state.coins||0;
+ const avg=averageScore();document.getElementById('sAverage').textContent=avg===null?'—':`${avg}%`;
+
+ const grid=document.getElementById('themeGrid');grid.innerHTML='';
+ THEMES.forEach((t,i)=>{
+   const ms=modeState(i);
+   const doneCount=['learn','definition','spell','exam'].filter(k=>ms[k]).length;
+   const pct=Math.round(doneCount/4*100);
+   const d=document.createElement('div');d.className='card';
+   const chips=[
+     ['Learn',ms.learn],['Definition',ms.definition],['Spelling',ms.spell],['Exam',ms.exam]
+   ].map(([n,v])=>`<span class="modechip ${v?'done':''}">${v?'✓ ':''}${n}</span>`).join('');
+   d.innerHTML=`<div class="tag">Theme ${i+1}</div><h3>${t.name}</h3>
+     <div class="words">${t.words.map(x=>x.word).join(' · ')}</div>
+     <div class="modechips">${chips}</div>
+     <div class="progress"><div class="bar" style="width:${pct}%"></div></div>
+     <div class="words">${pct}% complete${themeComplete(i)?' · Theme completed':''}</div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+       <button class="btn" onclick="openTheme(${i})">${themeComplete(i)?'Review Theme':'Start Learning'}</button>
+       <button class="btn secondary" onclick="openTheme(${i});setTimeout(()=>startQuiz('exam'),50)">Exam Mode</button>
+     </div>`;
+   grid.appendChild(d);
+ });
+
+ const cp=document.getElementById('checkpointGrid');cp.innerHTML='';
+ for(let b=0;b<4;b++){
+   const start=b*6,end=start+5;
+   const doneInBlock=[0,1,2,3,4,5].filter(x=>themeComplete(start+x)).length;
+   const unlocked=doneInBlock===6,earned=!!state.badges[b],score=bestScore(`cp-${b}`);
+   const d=document.createElement('div');d.className='cp '+(!unlocked?'locked':'');
+   const status=earned?`Badge earned${score?` · Best ${score}%`:''}`:
+     unlocked?'Unlocked · Ready for review':`Locked · Complete Themes ${start+1}–${end+1} first`;
+   d.innerHTML=`<div class="tag">Checkpoint ${b+1}</div><h3>Themes ${start+1}–${end+1}</h3>
+     <p class="words">48-word complete challenge</p><div style="margin:10px 0 14px;font-weight:800">${status}</div>
+     ${!unlocked?`<div class="locknote">Progress: ${doneInBlock}/6 themes completed</div>`:''}
+     <button class="btn" ${unlocked?'':'disabled'} onclick="openCheckpoint(${b})">${earned?'Review Again':unlocked?'Start Review':'Locked'}</button>`;
+   cp.appendChild(d);
+ }
+ const allBadges=[0,1,2,3].every(x=>state.badges[x]);
+ document.getElementById('finalBtn').disabled=!allBadges;
+ const finalStatus=document.getElementById('finalStatus');
+ const fs=bestScore('final');
+ if(finalStatus)finalStatus.textContent=allBadges?(state.finalPassed?`Passed · Best ${fs}%`:'Unlocked · Final Challenge ready'):`Locked · ${[0,1,2,3].filter(x=>state.badges[x]).length}/4 checkpoint badges earned`;
+ const certBtn=document.getElementById('certBtn');if(certBtn)certBtn.disabled=!state.finalPassed;
+}
+
+
+let englishVoice=null;
+function loadEnglishVoice(){
+ if(!('speechSynthesis' in window))return;
+ const voices=window.speechSynthesis.getVoices();
+ englishVoice=
+   voices.find(v=>/^en-GB$/i.test(v.lang))||
+   voices.find(v=>/^en-GB/i.test(v.lang))||
+   voices.find(v=>/^en/i.test(v.lang))||
+   null;
+}
+if('speechSynthesis' in window){
+ loadEnglishVoice();
+ window.speechSynthesis.onvoiceschanged=loadEnglishVoice;
+}
+function speakWord(text){
+ if(!('speechSynthesis' in window)){
+   alert('Pronunciation is not supported by this browser.');
+   return;
+ }
+ window.speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(text);
+ u.lang=englishVoice?.lang||'en-GB';
+ if(englishVoice)u.voice=englishVoice;
+ u.rate=0.82;
+ u.pitch=1;
+ window.speechSynthesis.speak(u);
+}
+
+function openTheme(i){
+ if(testInProgress){
+   alert('Finish the test before opening Learn notes.');
+   return;
+ }
+ currentTheme=i;modeState(i).learn=true;save();
+ const t=THEMES[i];
+ document.getElementById('mEyebrow').textContent=`Theme ${i+1}`;
+ document.getElementById('mTitle').textContent=t.name;
+ document.getElementById('modal').classList.add('open');
+ showLearn();
+}
+function tabs(active){
+ const learnLocked=testInProgress && active!=='learn';
+ return `<div class="tabs">
+ <button class="tab ${active==='learn'?'active':''}" ${learnLocked?'disabled':''} onclick="showLearn()">${learnLocked?'Learn · Locked':'Learn'}</button>
+ <button class="tab ${active==='definition'?'active':''}" onclick="startQuiz('definition')">Definition</button>
+ <button class="tab ${active==='spell'?'active':''}" onclick="startQuiz('spell')">Spelling</button>
+ <button class="tab ${active==='exam'?'active':''}" onclick="startQuiz('exam')">Exam Mode</button>
+ <button class="tab ${active==='revise'?'active':''}" onclick="startQuiz('revise')">Revise Mistakes</button>
+ </div>`;
+}
+function showLearn(){
+ if(testInProgress){
+   alert('Learn notes are locked while a test is in progress.');
+   return;
+ }
+ const t=THEMES[currentTheme],m=modeState(currentTheme);m.learn=true;save();
+ document.getElementById('modalBody').innerHTML=tabs('learn')+
+ `<div class="wordlist">${t.words.map(x=>`<div class="worditem"><b>${x.word}</b><div class="meaning">${x.meaning}</div><button class="speakbtn" onclick='speakWord(${JSON.stringify(x.word)})'>Listen</button><div style="margin-top:8px;line-height:1.45"><strong>English clue:</strong> ${x.definition}</div></div>`).join('')}</div>
+ <div class="footerline"><span class="meaning">Learn the clue first, then practise guessing the word.</span><button class="btn" onclick="startQuiz('definition')">Start Definition Practice</button></div>`;
+}
+function startQuiz(mode){
+ testInProgress=true;
+ quizMode=mode;const t=THEMES[currentTheme];
+ quizItems=mode==='revise'?t.words.filter(x=>state.revise[x.word]):[...t.words];
+ if(!quizItems.length){
+   testInProgress=false;
+   document.getElementById('modalBody').innerHTML=tabs('revise')+'<div class="quizbox"><div class="prompt">No mistakes to revise in this theme.</div><p>Words leave the revise list after two correct revision answers in a row.</p></div>';return;
+ }
+ quizItems.sort(()=>Math.random()-.5);qi=0;score=0;showQuestion();
+}
+function showQuestion(){
+ const item=quizItems[qi],rec=wordRecord(item.word);
+ let p=quizMode==='definition'
+ ? `${item.definition}<div class="chips"><span class="chip">First letter: ${item.word.charAt(0).toUpperCase()}</span><span class="chip">${item.word.replace(/ /g,'').length} letters${item.word.includes(' ')?' · includes a space':''}</span></div>`
+ : quizMode==='exam'?item.definition
+ : quizMode==='revise'?`${item.definition}<div class="chips"><span class="chip">Revision streak: ${rec.streak||0}/2</span>${rec.lastWrong?`<span class="chip">Last answer: ${rec.lastWrong}</span>`:''}</div>`
+ : item.meaning;
+ document.getElementById('modalBody').innerHTML=tabs(quizMode)+`<div class="quizbox">
+ <div class="qcount">Question ${qi+1} / ${quizItems.length}</div><div class="prompt">${p}</div>
+ <input id="ans" autocomplete="off" placeholder="Type the English word" onkeydown="if(event.key==='Enter')checkAnswer()">
+ <button class="btn" onclick="checkAnswer()">Check</button><div id="feedback" class="feedback"></div></div>`;
+ setTimeout(()=>document.getElementById('ans')?.focus(),50);
+}
+function checkAnswer(){
+ const item=quizItems[qi],val=document.getElementById('ans').value;
+ const ok=norm(val)===norm(item.word),fb=document.getElementById('feedback');
+ if(ok){
+   score++;
+   const firstMaster=!state.mastered[item.word];state.mastered[item.word]=true;
+   if(firstMaster)state.coins=(state.coins||0)+1;
+   if(quizMode==='revise'){
+     reviseCorrect(item.word);
+     const left=state.revise[item.word]?wordRecord(item.word).streak:2;
+     fb.innerHTML=state.revise[item.word]?`Correct. Revision streak ${left}/2.`:'Correct twice in revision. Removed from mistake list.';
+   }else fb.textContent=firstMaster?'Correct. +1 coin':'Correct.';
+   fb.className='feedback ok';
+ }else{
+   addRevise(item.word,val);fb.className='feedback bad';
+   fb.innerHTML=`Not yet. Correct answer: <b>${item.word}</b><br><button class="speakbtn" onclick='speakWord(${JSON.stringify(item.word)})'>Listen</button><div style="margin-top:6px;font-weight:500">${item.definition}<br>${item.meaning}</div>`;
+ }
+ save();document.querySelector('.quizbox .btn').disabled=true;
+ setTimeout(()=>{qi++;if(qi<quizItems.length)showQuestion();else finishQuiz()},700);
+}
+function finishQuiz(){
+ testInProgress=false;
+ const pct=Math.round(score/quizItems.length*100);
+ if(quizMode!=='revise'){
+   recordBest(`theme-${currentTheme}-${quizMode}`,pct);
+   if(pct>=75){modeState(currentTheme)[quizMode]=true;markThemeIfComplete(currentTheme)}
+ }
+ save();
+ const completedNow=themeComplete(currentTheme);
+ document.getElementById('modalBody').innerHTML=`<div class="quizbox"><div class="eyebrow">Completed</div>
+ <div class="prompt">${score} / ${quizItems.length} · ${pct}%</div>
+ <p>${quizMode==='revise'?'Revision finished. Words need two correct revision answers in a row to leave the list.':pct>=75?`${quizMode==='definition'?'Definition':quizMode==='spell'?'Spelling':'Exam'} stage passed.${completedNow?' Theme completed.':''}`:'Keep practising. Reach 75% to pass this stage.'}</p>
+ <div class="footerline"><button class="btn secondary" onclick="showLearn()">Back to Theme</button>${quizMode!=='exam'?"<button class=\"btn\" onclick=\"startQuiz('exam')\">Exam Mode</button>":''}</div></div>`;
+}
+
+function openReviseAll(){
+ testInProgress=true;
+ const all=THEMES.flatMap((t,ti)=>t.words.map(w=>({...w,theme:ti}))).filter(x=>state.revise[x.word]);
+ document.getElementById('mEyebrow').textContent='Revision';
+ document.getElementById('mTitle').textContent='All Mistakes';
+ document.getElementById('modal').classList.add('open');
+ if(!all.length){testInProgress=false;document.getElementById('modalBody').innerHTML='<div class="quizbox"><div class="prompt">No words to revise.</div></div>';return}
+ let items=[...all].sort(()=>Math.random()-.5),i=0,good=0;
+ function q(){
+   const x=items[i],r=wordRecord(x.word);
+   document.getElementById('modalBody').innerHTML=`<div class="quizbox"><div class="qcount">Revision ${i+1}/${items.length} · Theme ${x.theme+1}</div>
+   <div class="prompt">${x.definition}</div><div class="chips"><span class="chip">Streak ${r.streak||0}/2</span>${r.lastWrong?`<span class="chip">Last answer: ${r.lastWrong}</span>`:''}</div>
+   <input id="allRevAns" placeholder="Type the English word"><button class="btn" id="allRevBtn">Check</button><div id="allRevFb" class="feedback"></div></div>`;
+   const inp=document.getElementById('allRevAns'),btn=document.getElementById('allRevBtn');
+   btn.onclick=()=>{
+     const ok=norm(inp.value)===norm(x.word),fb=document.getElementById('allRevFb');
+     if(ok){good++;reviseCorrect(x.word);fb.className='feedback ok';fb.textContent=state.revise[x.word]?`Correct. Streak ${wordRecord(x.word).streak}/2.`:'Correct twice. Removed from mistake list.'}
+     else{addRevise(x.word,inp.value);fb.className='feedback bad';fb.innerHTML=`Correct answer: <b>${x.word}</b><br><button class="speakbtn" onclick='speakWord(${JSON.stringify(x.word)})'>Listen</button><br>${x.meaning}<br>${x.definition}`}
+     btn.disabled=true;save();i++;setTimeout(()=>i<items.length?q():done(),650);
+   };inp.onkeydown=e=>{if(e.key==='Enter')btn.click()};setTimeout(()=>inp.focus(),50);
+ }
+ function done(){testInProgress=false;document.getElementById('modalBody').innerHTML=`<div class="quizbox"><div class="eyebrow">Revision Completed</div><div class="prompt">${good}/${items.length}</div><p>Words still to revise: ${Object.keys(state.revise).length}</p></div>`}
+ q();
+}
+
+function openCheckpoint(b){
+ const start=b*6,words=THEMES.slice(start,start+6).flatMap(t=>t.words);challengeReturnTheme=start;
+ document.getElementById('mEyebrow').textContent=`Checkpoint ${b+1}`;document.getElementById('mTitle').textContent=`Themes ${start+1}–${start+6}`;
+ document.getElementById('modal').classList.add('open');
+ runSet(words,pct=>{
+   recordBest(`cp-${b}`,pct);
+   const first=!state.badges[b];state.badges[b]=true;if(first)state.coins+=20;save();
+ },`Checkpoint ${b+1}`);
+}
+function runSet(words,onPass,modeLabel='Challenge'){
+ const PAGE_SIZE=8,items=[...words].sort(()=>Math.random()-.5);
+ let page=0,answers={},checked={},totalCorrect=0;const pages=Math.ceil(items.length/PAGE_SIZE);
+ function renderPage(){
+  const from=page*PAGE_SIZE,part=items.slice(from,from+PAGE_SIZE);
+  document.getElementById('modalBody').innerHTML=`<div class="quizbox">
+   <div class="qcount">${modeLabel} · Page ${page+1}/${pages} · ${Math.min(from+PAGE_SIZE,items.length)}/${items.length}</div>
+   <div style="height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:10px 0 20px"><div style="height:100%;width:${Math.round(Math.min(from+PAGE_SIZE,items.length)/items.length*100)}%;background:#111827"></div></div>
+   ${part.map((x,j)=>`<div class="worditem" style="margin-bottom:14px"><div class="qcount">Question ${from+j+1}</div><div class="prompt" style="font-size:18px;margin:7px 0 10px">${x.definition}</div><input class="pageAns" data-index="${from+j}" placeholder="Type the English word" value="${answers[from+j]||''}" ${checked[page]?'disabled':''}><div id="fb${from+j}" class="feedback"></div></div>`).join('')}
+   <div class="footerline"><button class="btn secondary" id="prevBtn" ${page===0?'disabled':''}>Previous</button><span class="chip">8 questions per page</span><button class="btn" id="actionBtn">${checked[page]?(page===pages-1?'View Result':'Next Page'):'Semak'}</button></div></div>`;
+  document.querySelectorAll('.pageAns').forEach(inp=>inp.oninput=()=>answers[+inp.dataset.index]=inp.value);
+  document.getElementById('prevBtn').onclick=()=>{if(page>0){page--;renderPage()}};
+  document.getElementById('actionBtn').onclick=()=>{if(!checked[page])checkPage(part,from);else if(page<pages-1){page++;renderPage()}else finish()};
+  if(checked[page])feedback(part,from,false);
+ }
+ function checkPage(part,from){
+  document.querySelectorAll('.pageAns').forEach(inp=>answers[+inp.dataset.index]=inp.value);checked[page]=true;feedback(part,from,true);
+  document.querySelectorAll('.pageAns').forEach(x=>x.disabled=true);document.getElementById('actionBtn').textContent=page===pages-1?'View Result':'Next Page';
+ }
+ function feedback(part,from,update){
+  part.forEach((x,j)=>{
+   const idx=from+j,ok=norm(answers[idx])===norm(x.word),fb=document.getElementById('fb'+idx);
+   if(ok){fb.className='feedback ok';fb.innerHTML=`Correct: <b>${x.word}</b>`;if(update){totalCorrect++;if(!state.mastered[x.word]){state.mastered[x.word]=true;state.coins+=1}}}
+   else{fb.className='feedback bad';fb.innerHTML=`Correct answer: <b>${x.word}</b><br><button class="speakbtn" onclick='speakWord(${JSON.stringify(x.word)})'>Listen</button><div style="margin-top:5px;font-weight:500">${x.meaning}<br>${x.definition}</div>`;if(update)addRevise(x.word,answers[idx]||'')}
+  });if(update)save();
+ }
+ function finish(){
+  const pct=Math.round(totalCorrect/items.length*100),wrong=items.length-totalCorrect;
+  if(modeLabel==='Final Challenge')recordBest('final',pct);
+  if(pct>=75)onPass(pct);
+  else if(modeLabel.startsWith('Checkpoint'))recordBest(`cp-${Number(modeLabel.split(' ')[1])-1}`,pct);
+  document.getElementById('modalBody').innerHTML=`<div class="quizbox" style="text-align:center"><div class="eyebrow">${modeLabel} Result</div><div class="prompt" style="font-size:40px">${pct}%</div><p>${totalCorrect}/${items.length}</p>
+  <div class="chips" style="justify-content:center"><span class="chip">Correct ${totalCorrect}</span><span class="chip">Wrong ${wrong}</span><span class="chip">Revise ${Object.keys(state.revise).length}</span></div>
+  <p style="margin-top:20px;font-weight:800">${pct>=75?'Passed · Reward unlocked':'Not passed · 75% required'}</p>
+  ${wrong?'<button class="btn secondary no-print" onclick="openReviseAll()">Revise Mistakes</button>':''}</div>`;save();
+ }
+ renderPage();
+}
+function openFinal(){
+ challengeReturnTheme=0;
+ document.getElementById('mEyebrow').textContent='Final Challenge';document.getElementById('mTitle').textContent='192 Words Challenge';document.getElementById('modal').classList.add('open');
+ runSet(THEMES.flatMap(t=>t.words),pct=>{
+   recordBest('final',pct);const first=!state.finalPassed;state.finalPassed=true;if(first)state.coins+=50;save();
+ },'Final Challenge');
+}
+
+function showDashboard(){
+ const avg=averageScore(),completed=Array.from({length:24},(_,i)=>themeComplete(i)).filter(Boolean).length;
+ document.getElementById('mEyebrow').textContent='Teacher Dashboard';document.getElementById('mTitle').textContent=state.student||'Student';document.getElementById('modal').classList.add('open');
+ const rows=THEMES.map((t,i)=>{
+   const m=modeState(i);return `<tr><td>${i+1}. ${t.name}</td><td>${m.learn?'✓':'—'}</td><td>${bestScore(`theme-${i}-definition`)||'—'}</td><td>${bestScore(`theme-${i}-spell`)||'—'}</td><td>${bestScore(`theme-${i}-exam`)||'—'}</td><td>${themeComplete(i)?'Complete':'In progress'}</td></tr>`;
+ }).join('');
+ document.getElementById('modalBody').innerHTML=`
+ <div class="dashboard-grid">
+  <div class="mini"><div class="big">${completed}/24</div><div class="label">Themes completed</div></div>
+  <div class="mini"><div class="big">${Object.keys(state.mastered).length}/192</div><div class="label">Words mastered</div></div>
+  <div class="mini"><div class="big">${avg===null?'—':avg+'%'}</div><div class="label">Average score</div></div>
+  <div class="mini"><div class="big">${Object.keys(state.revise).length}</div><div class="label">Words to revise</div></div>
+  <div class="mini"><div class="big">${[0,1,2,3].filter(x=>state.badges[x]).length}/4</div><div class="label">Checkpoint badges</div></div>
+  <div class="mini"><div class="big">${state.finalPassed?'Passed':'—'}</div><div class="label">Final challenge</div></div>
+ </div>
+ <div class="chips">${[0,1,2,3].map(b=>`<span class="chip">CP${b+1}: ${bestScore(`cp-${b}`)||'—'}${bestScore(`cp-${b}`)?'%':''}</span>`).join('')}<span class="chip">Final: ${bestScore('final')||'—'}${bestScore('final')?'%':''}</span></div>
+ <div class="tablewrap"><table><thead><tr><th>Theme</th><th>Learn</th><th>Definition</th><th>Spelling</th><th>Exam</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function showHome(){
+ const lv=Math.min(state.home.level,HOME_LEVELS.length-1),room=HOME_LEVELS[lv],next=HOME_LEVELS[lv+1];
+ document.getElementById('mEyebrow').textContent='My Home';document.getElementById('mTitle').textContent='Learn words. Earn Coins. Build your place.';document.getElementById('modal').classList.add('open');
+ const owned=SHOP.filter(x=>state.home.owned.includes(x.id));
+ document.getElementById('modalBody').innerHTML=`
+ <div class="home-stage"><div class="home-room">${room.symbol}</div><h2>${room.name}</h2><p>Coin balance: <b>${state.coins}</b> · Total spent: ${state.home.spent||0}</p>
+ ${next?`<button class="btn" onclick="upgradeHome()">Upgrade to ${next.name} · ${next.cost} Coins</button>`:'<span class="chip">Maximum home level reached</span>'}
+ <div class="chips" style="justify-content:center">${owned.length?owned.map(x=>`<span class="chip">${x.name}</span>`).join(''):'<span class="chip">No furniture yet</span>'}</div></div>
+ <h3 style="margin-top:22px">Furniture Shop</h3><div class="shop">${SHOP.map(x=>`<div class="shopitem"><b>${x.name}</b><div class="meaning">${x.cost} Coins</div><button class="btn secondary" style="margin-top:10px" ${state.home.owned.includes(x.id)?'disabled':''} onclick="buyItem('${x.id}')">${state.home.owned.includes(x.id)?'Owned':'Buy'}</button></div>`).join('')}</div>`;
+}
+function upgradeHome(){
+ const next=HOME_LEVELS[state.home.level+1];if(!next)return;
+ if(state.coins<next.cost){alert('Not enough Coins yet.');return}
+ state.coins-=next.cost;state.home.spent=(state.home.spent||0)+next.cost;state.home.level++;save();showHome();
+}
+function buyItem(id){
+ const item=SHOP.find(x=>x.id===id);if(!item||state.home.owned.includes(id))return;
+ if(state.coins<item.cost){alert('Not enough Coins yet.');return}
+ state.coins-=item.cost;state.home.spent=(state.home.spent||0)+item.cost;state.home.owned.push(id);save();showHome();
+}
+
+function downloadBackup(){
+ const payload={app:'Year 5 Word Scoop',version:'Final',exportedAt:new Date().toISOString(),state};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=`year5-word-scoop-${(state.student||'student').replace(/[^a-z0-9_-]+/gi,'-')}-backup.json`;a.click();URL.revokeObjectURL(url);
+}
+function restoreBackup(file){
+ if(!file)return;const r=new FileReader();
+ r.onload=()=>{try{
+   const data=JSON.parse(r.result),incoming=data.state||data;
+   if(!incoming||typeof incoming!=='object')throw new Error('Invalid backup');
+   if(confirm('Restore this backup and replace the current progress?')){state=migrateState(incoming);save();alert('Backup restored.')}
+ }catch(e){alert('This backup file is not valid.')}};r.readAsText(file);
+}
+
+function showCertificate(){
+ document.getElementById('mEyebrow').textContent='Certificate';document.getElementById('mTitle').textContent='Year 5 Word Scoop';document.getElementById('modal').classList.add('open');
+ const name=state.student||'Student',date=new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'});
+ document.getElementById('modalBody').innerHTML=`<div style="padding:38px 28px;text-align:center;border:4px double #111827;border-radius:20px">
+ <div class="eyebrow">Certificate of Completion</div><p>This certifies that</p><h2 style="font-size:38px;margin:14px 0">${name}</h2>
+ <p>has successfully completed</p><h3 style="font-size:28px;margin:10px 0">Year 5 Word Scoop</h3>
+ <p>24 Themes · 192 Words · 4 Checkpoints · Final 192 Words Challenge</p>
+ <div class="chips" style="justify-content:center"><span class="chip">Final Best: ${bestScore('final')}%</span><span class="chip">Words Mastered: ${Object.keys(state.mastered).length}/192</span></div>
+ <p style="margin-top:26px">${date}</p><button class="btn no-print" onclick="window.print()">Print Certificate</button></div>`;
+}
+function closeModal(){
+ if(testInProgress){
+   alert('Finish the test before closing this window.');
+   return;
+ }
+ document.getElementById('modal').classList.remove('open')
+}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+render();
+</script>
+</body>
+</html>
